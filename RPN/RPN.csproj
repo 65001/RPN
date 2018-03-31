@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+	<RuntimeIdentifiers>win10-x64;osx.10.11-x64;Portable</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="AbMath">
+      <HintPath>..\..\AbMath\Shunting Yard Library\bin\Release\netstandard2.0\AbMath.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
