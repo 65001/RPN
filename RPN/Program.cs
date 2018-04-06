@@ -7,6 +7,7 @@ namespace Solver
     class Program
     {
         private RPN RPN;
+        private static bool DebugMode;
 
         static void Main(string[] args)
         {
@@ -26,7 +27,7 @@ namespace Solver
 
             while (1 == 1)
             {
-                try
+                //try
                 {
                     Console.ForegroundColor = ConsoleColor.Gray;
                     string Equation = string.Empty;
@@ -40,79 +41,91 @@ namespace Solver
 
                     if (Equation.StartsWith('~'))
                     {
-                        CLI(Equation);
+                         CLI(Equation);
                     }
                     else
                     {
-                        Calculate(Equation);
+                        double Answer = Calculate(Equation);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write("Answer:");
+                        Console.WriteLine(Answer);
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
-
-
                     Console.Write("Press any key to continue...");
                     Console.ReadKey(true);
                     Console.Clear();
                 }
-                catch (Exception ex)
+                //catch (Exception ex)
                 {
-                    Console.WriteLine("An Error happened!");
-                    Console.WriteLine(ex);
+                   // Console.WriteLine("An Error happened!");
+                   // Console.WriteLine(ex);
                 }
             }
+        }
 
-            void CLI(string Equation)
+        ///<summary>
+        /// All the Command Line Interpreter Code Here
+        /// </summary>
+        static void CLI(string Equation)
+        {
+            StringComparison SC = StringComparison.InvariantCultureIgnoreCase;
+            if (Equation.StartsWith("~functions", SC))
             {
-                StringComparison SC = StringComparison.InvariantCultureIgnoreCase;
-                if (Equation.StartsWith("~functions", SC))
+                var RPN = new RPN("");
+                foreach (KeyValuePair<string, RPN.Functions> KV in RPN.ReadOnlyFunctions)
                 {
-                    var RPN = new RPN("");
-                    foreach (KeyValuePair<string,RPN.Functions> KV in RPN.ReadOnlyFunctions)
-                    {
-                        Console.WriteLine(KV.Key);
-                    }
+                    Console.WriteLine(KV.Key);
                 }
-                else if (Equation.StartsWith("~operators", SC))
-                {
-                    var RPN = new RPN("");
-                    foreach (KeyValuePair<string, RPN.Operators> KV in RPN.ReadOnlyOperators)
-                    {
-                        Console.WriteLine(KV.Key);
-                    }
-                }
-
-
             }
-
-            void Calculate(string Equation)
+            else if (Equation.StartsWith("~operators", SC))
             {
-                var RPN = new RPN(Equation);
+                var RPN = new RPN("");
+                foreach (KeyValuePair<string, RPN.Operators> KV in RPN.ReadOnlyOperators)
+                {
+                    Console.WriteLine(KV.Key);
+                }
+            }
+            else if (Equation.StartsWith("~debug", SC))
+            {
+                DebugMode = !DebugMode;
+                Console.WriteLine($"Debug Mode : {DebugMode}");
+            }
+        }
+
+        ///<summary>
+        /// All the RPN math interactions.
+        /// </summary>
+        static double Calculate(string Equation)
+        {
+            var RPN = new RPN(Equation);
+            if (DebugMode)
+            {
                 RPN.Logger += Write;
-                RPN.Compute();
-
-                Console.WriteLine("Reverse Polish Notation:");
-                Console.WriteLine(RPN.Polish.Print());
-                PostFix postFix = new PostFix(RPN);
-
-                if (RPN.ContainsVariables)
-                {
-                    Console.WriteLine("Set the variables");
-                    for (int i = 0; i < RPN.Variables.Count; i++)
-                    {
-                        Console.Write(RPN.Variables[i] + "=");
-                        postFix.SetVariable(RPN.Variables[i], Console.ReadLine());
-                    }
-                }
-
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("Answer:");
-                Console.WriteLine(postFix.Compute());
-                Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Gray;
             }
+            RPN.Compute();
 
-            void Write(object sender, string Event)
+            Console.WriteLine("Reverse Polish Notation:");
+            Console.WriteLine(RPN.Polish.Print());
+            PostFix postFix = new PostFix(RPN);
+
+            if (RPN.ContainsVariables)
             {
-                Console.WriteLine(Event);
+                Console.WriteLine("Set the variables");
+                for (int i = 0; i < RPN.Variables.Count; i++)
+                {
+                    Console.Write(RPN.Variables[i] + "=");
+                    var VariableExpression = Console.ReadLine();
+                    postFix.SetVariable(RPN.Variables[i], Calculate(VariableExpression).ToString());
+                }
             }
+
+            return postFix.Compute();
+        }
+
+        static void Write(object sender, string Event)
+        {
+            Console.WriteLine(Event);
         }
     }
 }

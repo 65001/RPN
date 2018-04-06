@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <Reference Include="AbMath">
-      <HintPath>..\..\AbMath\Shunting Yard Library\bin\Release\netstandard2.0\AbMath.dll</HintPath>
+      <HintPath>..\..\AbMath\AbMath\obj\Release\netstandard2.0\AbMath.dll</HintPath>
     </Reference>
   </ItemGroup>
 
