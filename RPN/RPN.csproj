@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <Reference Include="AbMath">
-      <HintPath>..\..\AbMath\AbMath\obj\Release\netstandard2.0\AbMath.dll</HintPath>
+      <HintPath>..\..\AbMath\AbMath\bin\Release\netstandard2.0\AbMath.dll</HintPath>
     </Reference>
   </ItemGroup>
 

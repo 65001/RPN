@@ -11,18 +11,18 @@ namespace Solver
 
         static void Main(string[] args)
         {
-            Console.Title = "Math Solver 1.0.1";
+            Console.Title = "Math Solver 1.0.3";
             Console.WindowWidth = Console.BufferWidth;
             Console.WriteLine("(C) 2018. Abhishek Sathiabalan");
 
             Console.WriteLine("Recent Changes:");
-            Console.WriteLine("Uniary negative is now implemented.");
+            Console.WriteLine("Unary negative is now implemented.");
             Console.WriteLine("Composite Function bug should now be fixed.");
 
             Console.WriteLine("");
             Console.WriteLine("Known Bugs:");
             Console.WriteLine("Space between terms is necessary.");
-            Console.WriteLine("Implict multiplication.");
+            Console.WriteLine("Implicit multiplication.");
             Console.WriteLine();
 
             while (1 == 1)
@@ -49,6 +49,7 @@ namespace Solver
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write("Answer:");
                         Console.WriteLine(Answer);
+
                         Console.WriteLine();
                         Console.ForegroundColor = ConsoleColor.Gray;
                     }
@@ -69,11 +70,12 @@ namespace Solver
         /// </summary>
         static void CLI(string Equation)
         {
+            
             StringComparison SC = StringComparison.InvariantCultureIgnoreCase;
             if (Equation.StartsWith("~functions", SC))
             {
                 var RPN = new RPN("");
-                foreach (KeyValuePair<string, RPN.Functions> KV in RPN.ReadOnlyFunctions)
+                foreach (KeyValuePair<string, RPN.Function> KV in RPN.data.Functions)
                 {
                     Console.WriteLine(KV.Key);
                 }
@@ -81,7 +83,7 @@ namespace Solver
             else if (Equation.StartsWith("~operators", SC))
             {
                 var RPN = new RPN("");
-                foreach (KeyValuePair<string, RPN.Operators> KV in RPN.ReadOnlyOperators)
+                foreach (KeyValuePair<string, RPN.Operator> KV in RPN.data.Operators)
                 {
                     Console.WriteLine(KV.Key);
                 }
@@ -104,28 +106,44 @@ namespace Solver
                 RPN.Logger += Write;
             }
             RPN.Compute();
+            if (DebugMode == false)
+            {
+                Console.WriteLine("Reverse Polish Notation:");
+                Console.WriteLine(RPN.Polish.Print());
+            }
 
-            Console.WriteLine("Reverse Polish Notation:");
-            Console.WriteLine(RPN.Polish.Print());
             PostFix postFix = new PostFix(RPN);
+            if (DebugMode)
+            {
+                postFix.Logger += Write;
+            }
+
 
             if (RPN.ContainsVariables)
             {
                 Console.WriteLine("Set the variables");
-                for (int i = 0; i < RPN.Variables.Count; i++)
+                for (int i = 0; i < RPN.data.Variables.Count; i++)
                 {
-                    Console.Write(RPN.Variables[i] + "=");
+                    Console.Write(RPN.data.Variables[i] + "=");
                     var VariableExpression = Console.ReadLine();
-                    postFix.SetVariable(RPN.Variables[i], Calculate(VariableExpression).ToString());
+                    postFix.SetVariable(RPN.data.Variables[i], Calculate(VariableExpression).ToString());
                 }
             }
 
-            return postFix.Compute();
+            double answer = postFix.Compute();
+            if (RPN.data.Format.ContainsKey(answer))
+            {
+                Console.WriteLine($"This answer can also be formatted as {RPN.data.Format[answer] }");
+            }
+
+            return answer;
         }
 
         static void Write(object sender, string Event)
         {
             Console.WriteLine(Event);
         }
+
+
     }
 }
