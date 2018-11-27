@@ -42,6 +42,12 @@ namespace Solver
                         if (Equation.Length == 0) { Console.Clear(); }
                     }
 
+                    if (MarkDownMode)
+                    {
+                        Console.Clear();
+                        Console.WriteLine($"Equation>``{Equation}``");
+                    }
+
                     if (Equation.StartsWith('~'))
                     {
                          CLI(Equation);
@@ -50,8 +56,16 @@ namespace Solver
                     {
                         double Answer = Calculate(Equation);
                         Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write("Answer:");
-                        Console.WriteLine(Answer);
+                        if (MarkDownMode)
+                        {
+                            Console.WriteLine($"Answer: ``{Answer}``");
+                        }
+                        else
+                        {
+                            Console.Write("Answer:");
+                            Console.WriteLine(Answer);
+                        }
+
                         PrevAnswer = Answer;
 
                         Console.WriteLine();
