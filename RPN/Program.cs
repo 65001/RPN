@@ -8,16 +8,18 @@ namespace Solver
     {
         private RPN RPN;
         private static bool DebugMode;
+        private static double PrevAnswer;
 
         static void Main(string[] args)
         {
-            Console.Title = "Math Solver 1.0.3";
+            Console.Title = "Math Solver 1.0.4";
             Console.WindowWidth = Console.BufferWidth;
             Console.WriteLine("(C) 2018. Abhishek Sathiabalan");
 
             Console.WriteLine("Recent Changes:");
             Console.WriteLine("Unary negative is now implemented.");
             Console.WriteLine("Composite Function bug should now be fixed.");
+            Console.WriteLine("Variadic Functions & Implicit Left bug fixed");
 
             Console.WriteLine("");
             Console.WriteLine("Known Bugs:");
@@ -49,6 +51,7 @@ namespace Solver
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write("Answer:");
                         Console.WriteLine(Answer);
+                        PrevAnswer = Answer;
 
                         Console.WriteLine();
                         Console.ForegroundColor = ConsoleColor.Gray;
@@ -124,9 +127,17 @@ namespace Solver
                 Console.WriteLine("Set the variables");
                 for (int i = 0; i < RPN.data.Variables.Count; i++)
                 {
-                    Console.Write(RPN.data.Variables[i] + "=");
-                    var VariableExpression = Console.ReadLine();
-                    postFix.SetVariable(RPN.data.Variables[i], Calculate(VariableExpression).ToString());
+                    if (RPN.data.Variables[i] == "ans")
+                    {
+                        postFix.SetVariable(RPN.data.Variables[i], PrevAnswer.ToString());
+                        Console.WriteLine($"{RPN.data.Variables[i]}={PrevAnswer}");
+                    }
+                    else
+                    {
+                        Console.Write(RPN.data.Variables[i] + "=");
+                        var VariableExpression = Console.ReadLine();
+                        postFix.SetVariable(RPN.data.Variables[i], Calculate(VariableExpression).ToString());
+                    }
                 }
             }
 
