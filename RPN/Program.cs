@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AbMath.Utilities;
+using AbMath.Calculator;
 
 namespace Solver
 {
@@ -8,6 +8,7 @@ namespace Solver
     {
         private RPN RPN;
         private static bool DebugMode;
+        private static bool MarkDownMode;
         private static double PrevAnswer;
 
         static void Main(string[] args)
@@ -60,11 +61,6 @@ namespace Solver
                     Console.ReadKey(true);
                     Console.Clear();
                 }
-                //catch (Exception ex)
-                {
-                   // Console.WriteLine("An Error happened!");
-                   // Console.WriteLine(ex);
-                }
             }
         }
 
@@ -78,7 +74,7 @@ namespace Solver
             if (Equation.StartsWith("~functions", SC))
             {
                 var RPN = new RPN("");
-                foreach (KeyValuePair<string, RPN.Function> KV in RPN.data.Functions)
+                foreach (KeyValuePair<string, RPN.Function> KV in RPN.Data.Functions)
                 {
                     Console.WriteLine(KV.Key);
                 }
@@ -86,7 +82,7 @@ namespace Solver
             else if (Equation.StartsWith("~operators", SC))
             {
                 var RPN = new RPN("");
-                foreach (KeyValuePair<string, RPN.Operator> KV in RPN.data.Operators)
+                foreach (KeyValuePair<string, RPN.Operator> KV in RPN.Data.Operators)
                 {
                     Console.WriteLine(KV.Key);
                 }
@@ -96,6 +92,10 @@ namespace Solver
                 DebugMode = !DebugMode;
                 Console.WriteLine($"Debug Mode : {DebugMode}");
             }
+            else if (Equation.StartsWith("~md"))
+            {
+                MarkDownMode = !MarkDownMode;
+            }
         }
 
         ///<summary>
@@ -104,6 +104,8 @@ namespace Solver
         static double Calculate(string Equation)
         {
             var RPN = new RPN(Equation);
+            RPN.Data.MarkdownTables = MarkDownMode;
+
             if (DebugMode)
             {
                 RPN.Logger += Write;
@@ -125,26 +127,26 @@ namespace Solver
             if (RPN.ContainsVariables)
             {
                 Console.WriteLine("Set the variables");
-                for (int i = 0; i < RPN.data.Variables.Count; i++)
+                for (int i = 0; i < RPN.Data.Variables.Count; i++)
                 {
-                    if (RPN.data.Variables[i] == "ans")
+                    if (RPN.Data.Variables[i] == "ans")
                     {
-                        postFix.SetVariable(RPN.data.Variables[i], PrevAnswer.ToString());
-                        Console.WriteLine($"{RPN.data.Variables[i]}={PrevAnswer}");
+                        postFix.SetVariable(RPN.Data.Variables[i], PrevAnswer.ToString());
+                        Console.WriteLine($"{RPN.Data.Variables[i]}={PrevAnswer}");
                     }
                     else
                     {
-                        Console.Write(RPN.data.Variables[i] + "=");
+                        Console.Write(RPN.Data.Variables[i] + "=");
                         var VariableExpression = Console.ReadLine();
-                        postFix.SetVariable(RPN.data.Variables[i], Calculate(VariableExpression).ToString());
+                        postFix.SetVariable(RPN.Data.Variables[i], Calculate(VariableExpression).ToString());
                     }
                 }
             }
 
             double answer = postFix.Compute();
-            if (RPN.data.Format.ContainsKey(answer))
+            if (RPN.Data.Format.ContainsKey(answer))
             {
-                Console.WriteLine($"This answer can also be formatted as {RPN.data.Format[answer] }");
+                Console.WriteLine($"This answer can also be formatted as {RPN.Data.Format[answer] }");
             }
 
             return answer;
