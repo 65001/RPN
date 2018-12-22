@@ -93,7 +93,7 @@ namespace Solver
                     }
                     else
                     {
-                        double Answer = Calculate(Equation, start, end, freq);
+                        double Answer = Calculate(Equation, start, end, freq, true);
                         Console.ForegroundColor = ConsoleColor.White;
 
                         PrevAnswer = Answer;
@@ -151,7 +151,7 @@ namespace Solver
         ///<summary>
         /// All the RPN math interactions.
         /// </summary>
-        static double Calculate(string Equation, int start, int end, double freq)
+        static double Calculate(string Equation, double start, double end, double freq, bool write = false)
         {
             var RPN = new RPN(Equation);
             RPN.Data.MarkdownTables = MarkDownMode;
@@ -168,9 +168,6 @@ namespace Solver
                 postFix.Logger += Write;
             }
 
-
-            if (RPN.ContainsVariables)
-            {
                 double Rsum = 0;
                 double Lsum = 0;
                 int count = 0;
@@ -186,7 +183,11 @@ namespace Solver
                 tables.Add(new Schema {Column = "x", Width = 10});
                 tables.Add(new Schema {Column = "f(x)", Width = 10});
 
-                Console.WriteLine(tables.GenerateHeaders());
+                if (write)
+                {
+                    Console.WriteLine(tables.GenerateHeaders());
+                }
+
 
                 for (int x = 0; x <= max; x++)
                 {
@@ -217,32 +218,45 @@ namespace Solver
 
                     PrevAnswer = answer;
                     tables.Add(new string[] { (RealX).ToString(), answer.ToString(), });
-                    Console.Write( tables.GenerateNextRow() );
+                    if (write)
+                    {
+                        Console.Write(tables.GenerateNextRow());
+                        Console.WriteLine();
+                    }
 
                     postFix.Reset();
-                    Console.WriteLine();
                     count++;
                 }
 
-                Console.WriteLine(tables.GenerateFooter());
+                if (write)
+                {
+                    Console.WriteLine(tables.GenerateFooter());
+                }
 
-                if (tables.SuggestedRedraw)
+                if (tables.SuggestedRedraw && write)
                 {
                     Console.WriteLine(tables.Redraw());
                 }
 
+            if (write)
+            {
                 Console.WriteLine($"Elapsed Time: {sw.ElapsedMilliseconds} (ms)");
                 Console.WriteLine($"Iterations: {count} ");
                 Console.WriteLine();
 
                 Console.WriteLine($"Left Sum : {Rsum}");
                 Console.WriteLine($"Right Sum: {Lsum}");
-                Console.WriteLine($"Left Integral ? : {Rsum * DeltaX/n}");
-                Console.WriteLine($"Right Integral ? : {Lsum * DeltaX/n}");
-                return 0;
+                Console.WriteLine($"Left Integral ? : {Rsum * DeltaX / n}");
+                Console.WriteLine($"Right Integral ? : {Lsum * DeltaX / n}");
             }
 
-            return  postFix.Compute();
+            if (!RPN.ContainsVariables)
+            {
+                return postFix.Compute();
+            }
+
+            return 0;
+
         }
 
         static void Write(object sender, string Event)
