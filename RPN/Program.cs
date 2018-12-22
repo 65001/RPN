@@ -10,30 +10,45 @@ namespace Solver
         private static bool DebugMode;
         private static bool MarkDownMode;
         private static double PrevAnswer;
+        private static bool SupressOutput = false;
 
         static void Main(string[] args)
         {
-            Console.Title = "Math Solver 1.0.4";
-            Console.WindowWidth = Console.BufferWidth;
-            Console.WriteLine("(C) 2018. Abhishek Sathiabalan");
+            if (args.Length > 0)
+            {
+                SupressOutput = true;
+            }
 
-            Console.WriteLine("Recent Changes:");
-            Console.WriteLine("Unary negative is now implemented.");
-            Console.WriteLine("Composite Function bug should now be fixed.");
-            Console.WriteLine("Variadic Functions & Implicit Left bug fixed");
+            if (!SupressOutput)
+            {
+                Console.Title = "Math Solver 1.0.4";
+                Console.WindowWidth = Console.BufferWidth;
+                Console.WriteLine("(C) 2018. Abhishek Sathiabalan");
 
-            Console.WriteLine("");
-            Console.WriteLine("Known Bugs:");
-            Console.WriteLine("Space between terms is necessary.");
-            Console.WriteLine("Implicit multiplication.");
-            Console.WriteLine();
+                Console.WriteLine("Recent Changes:");
+                Console.WriteLine("Unary negative is now implemented.");
+                Console.WriteLine("Composite Function bug should now be fixed.");
+                Console.WriteLine("Variadic Functions & Implicit Left bug fixed");
 
-            while (1 == 1)
+                Console.WriteLine("");
+                Console.WriteLine("Known Bugs:");
+                Console.WriteLine("Space between terms is necessary.");
+                Console.WriteLine("Implicit multiplication.");
+                Console.WriteLine();
+            }
+
+            while (true)
             {
                 //try
                 {
                     Console.ForegroundColor = ConsoleColor.Gray;
                     string Equation = string.Empty;
+
+                    if (SupressOutput)
+                    {
+                        Equation = args[0];
+                    }
+
                     while (string.IsNullOrWhiteSpace(Equation))
                     {
                         Console.Write("Equation>");
@@ -60,20 +75,30 @@ namespace Solver
                         {
                             Console.WriteLine($"Answer: ``{Answer}``");
                         }
-                        else
+                        else if (!SupressOutput)
                         {
                             Console.Write("Answer:");
                             Console.WriteLine(Answer);
                         }
+                        else
+                        {
+                            Console.WriteLine(Answer);
+                        }
 
                         PrevAnswer = Answer;
-
-                        Console.WriteLine();
                         Console.ForegroundColor = ConsoleColor.Gray;
                     }
-                    Console.Write("Press any key to continue...");
-                    Console.ReadKey(true);
-                    Console.Clear();
+
+                    if (!SupressOutput)
+                    {
+                        Console.Write("Press any key to continue...");
+                        Console.ReadKey(true);
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -125,7 +150,8 @@ namespace Solver
                 RPN.Logger += Write;
             }
             RPN.Compute();
-            if (DebugMode == false)
+
+            if (SupressOutput == false && DebugMode == false)
             {
                 Console.WriteLine("Reverse Polish Notation:");
                 Console.WriteLine(RPN.Polish.Print());
@@ -170,7 +196,5 @@ namespace Solver
         {
             Console.WriteLine(Event);
         }
-
-
     }
 }
