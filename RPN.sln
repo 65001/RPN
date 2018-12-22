@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RPN", "RPN\RPN.csproj", "{B5AB7C2A-F991-47D7-8D9B-6A6CE0FCB3B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPNTables", "RPNTables\RPNTables.csproj", "{A7B454BC-3E2B-4842-B82E-5062F525798A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{B5AB7C2A-F991-47D7-8D9B-6A6CE0FCB3B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5AB7C2A-F991-47D7-8D9B-6A6CE0FCB3B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5AB7C2A-F991-47D7-8D9B-6A6CE0FCB3B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7B454BC-3E2B-4842-B82E-5062F525798A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7B454BC-3E2B-4842-B82E-5062F525798A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7B454BC-3E2B-4842-B82E-5062F525798A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7B454BC-3E2B-4842-B82E-5062F525798A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
