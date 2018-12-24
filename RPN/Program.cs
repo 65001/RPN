@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AbMath.Calculator;
 
 namespace Solver
@@ -167,18 +168,20 @@ namespace Solver
             if (RPN.ContainsVariables)
             {
                 Console.WriteLine("Set the variables");
-                for (int i = 0; i < RPN.Data.Variables.Count; i++)
+                var variables = RPN.Data.Variables.Distinct().ToList();
+
+                for (int i = 0; i < variables.Count; i++)
                 {
-                    if (RPN.Data.Variables[i] == "ans")
+                    if (variables[i] == "ans")
                     {
-                        postFix.SetVariable(RPN.Data.Variables[i], PrevAnswer.ToString());
-                        Console.WriteLine($"{RPN.Data.Variables[i]}={PrevAnswer}");
+                        postFix.SetVariable("ans", PrevAnswer.ToString());
+                        Console.WriteLine($"ans={PrevAnswer}");
                     }
                     else
                     {
-                        Console.Write(RPN.Data.Variables[i] + "=");
+                        Console.Write(variables[i] + "=");
                         var VariableExpression = Console.ReadLine();
-                        postFix.SetVariable(RPN.Data.Variables[i], Calculate(VariableExpression).ToString());
+                        postFix.SetVariable(variables[i], Calculate(VariableExpression));
                     }
                 }
             }

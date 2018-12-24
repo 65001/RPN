@@ -192,20 +192,10 @@ namespace Solver
                 for (int x = 0; x <= max; x++)
                 {
                     double RealX = start + count * DeltaX / n;
-                    for (int i = 0; i < RPN.Data.Variables.Count; i++)
-                    {
-                        
-                        if (RPN.Data.Variables[i] == "ans")
-                        {
-                            postFix.SetVariable(RPN.Data.Variables[i], PrevAnswer.ToString());
-                        }
-
-                        if (RPN.Data.Variables[i] == "x")
-                        {
-                            postFix.SetVariable(RPN.Data.Variables[i], (RealX).ToString());
-                        }
-                    }
+                    postFix.SetVariable("ans", PrevAnswer);
+                    postFix.SetVariable("x", RealX);
                     double answer = postFix.Compute();
+
                     if (x < max )
                     {
                         Rsum += answer;
