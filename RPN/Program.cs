@@ -130,6 +130,7 @@ namespace Solver
             else if (Equation.StartsWith("~debug", SC))
             {
                 DebugMode = !DebugMode;
+
                 Console.WriteLine($"Debug Mode : {DebugMode}");
             }
             else if (Equation.StartsWith("~md"))
@@ -148,6 +149,7 @@ namespace Solver
 
             if (DebugMode)
             {
+                RPN.Data.DebugMode = DebugMode;
                 RPN.Logger += Write;
             }
             RPN.Compute();

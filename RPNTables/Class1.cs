@@ -159,6 +159,8 @@ namespace Solver
             if (DebugMode)
             {
                 RPN.Logger += Write;
+                RPN.Data.DebugMode = true;
+                Console.WriteLine($"Debug Mode : { RPN.Data.DebugMode}");
             }
             RPN.Compute();
 
@@ -236,8 +238,14 @@ namespace Solver
 
                 Console.WriteLine($"Left Sum : {Rsum}");
                 Console.WriteLine($"Right Sum: {Lsum}");
+
+                double Min = Math.Min(Rsum * DeltaX / n, Lsum * DeltaX / n);
+                double Max = Math.Max(Rsum * DeltaX / n, Lsum * DeltaX / n);
+
                 Console.WriteLine($"Left Integral ? : {Rsum * DeltaX / n}");
                 Console.WriteLine($"Right Integral ? : {Lsum * DeltaX / n}");
+                Console.WriteLine();
+                Console.WriteLine($"{Min} ≤ x ≤ {Max}");
             }
 
             if (!RPN.ContainsVariables)
