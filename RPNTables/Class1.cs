@@ -165,6 +165,7 @@ namespace Solver
             RPN.Compute();
 
             PostFix postFix = new PostFix(RPN);
+            Console.ForegroundColor = ConsoleColor.White;
             if (DebugMode)
             {
                 postFix.Logger += Write;
@@ -212,9 +213,19 @@ namespace Solver
                     tables.Add(new string[] { (RealX).ToString(), answer.ToString(), });
                     if (write)
                     {
+                        if (RPN.Data.ContainsEquation && answer == 1)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                        }
+
                         Console.Write(tables.GenerateNextRow());
                         Console.WriteLine();
-                    }
+
+                        if (RPN.Data.ContainsEquation && answer == 1)
+                        {
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
+                }
 
                     postFix.Reset();
                     count++;
