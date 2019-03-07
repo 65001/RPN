@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using AbMath.Calculator;
 using CLI;
 
@@ -23,7 +25,7 @@ namespace Solver
 
             if (!SupressOutput)
             {
-                Console.Title = "Math Solver 1.0.4";
+                Console.Title = "Math Solver 1.0.5";
                 Console.WindowWidth = Console.BufferWidth;
                 Console.WriteLine("(C) 2018. Abhishek Sathiabalan");
 
@@ -93,7 +95,7 @@ namespace Solver
                     }
                     else
                     {
-                        double Answer = Calculate(Equation, start, end, freq, true);
+                        double Answer = Calculate(Equation, start, end, freq / 2, true);
                         Console.ForegroundColor = ConsoleColor.White;
 
                         PrevAnswer = Answer;
@@ -173,6 +175,10 @@ namespace Solver
 
                 double Rsum = 0;
                 double Lsum = 0;
+                double MidSum = 0;
+
+                double f_a = 0;
+
                 int count = 0;
                 double DeltaX = end - start;
                 double n =  DeltaX / freq;
@@ -183,14 +189,13 @@ namespace Solver
 
                 Config config = new CLI.Config {Title = "Table"};
                 Tables<string> tables = new Tables<string>(config);
-                tables.Add(new Schema {Column = "x", Width = 10});
-                tables.Add(new Schema {Column = "f(x)", Width = 10});
+                tables.Add(new Schema {Column = "x", Width = 20 });
+                tables.Add(new Schema {Column = "f(x)", Width = 25});
 
                 if (write)
                 {
                     Console.WriteLine(tables.GenerateHeaders());
                 }
-
 
                 for (int x = 0; x <= max; x++)
                 {
@@ -199,14 +204,26 @@ namespace Solver
                     postFix.SetVariable("x", RealX);
                     double answer = postFix.Compute();
 
-                    if (x < max )
+                    if (x == 0)
                     {
-                        Rsum += answer;
+                        f_a = answer;
                     }
 
-                    if (count > 0)
+                    if (x % 2 == 0)
                     {
-                        Lsum += answer;
+                        if (x < max)
+                        {
+                            Rsum += answer;
+                        }
+
+                        if (count > 0)
+                        {
+                            Lsum += answer;
+                        }
+                    }
+                    else
+                    {
+                        MidSum += answer;
                     }
 
                     PrevAnswer = answer;
@@ -247,16 +264,117 @@ namespace Solver
                 Console.WriteLine($"Iterations: {count} ");
                 Console.WriteLine();
 
-                Console.WriteLine($"Left Sum : {Rsum}");
-                Console.WriteLine($"Right Sum: {Lsum}");
+                double LApprox = (2 * Rsum * DeltaX / n);
+                double RApprox = (2 * Lsum * DeltaX / n);
+                double MApprox = (2 * MidSum * DeltaX / n);
+                double TApprox = (LApprox + RApprox) / 2;
 
-                double Min = Math.Min(Rsum * DeltaX / n, Lsum * DeltaX / n);
-                double Max = Math.Max(Rsum * DeltaX / n, Lsum * DeltaX / n);
+                double Lerror = 2 * DeltaX/n * Math.Abs(PrevAnswer - f_a);
 
-                Console.WriteLine($"Left Integral ? : {Rsum * DeltaX / n}");
-                Console.WriteLine($"Right Integral ? : {Lsum * DeltaX / n}");
+                Tables<string> Error = new Tables<string>(new Config()
+                {
+                    Format = Format.Default,
+                    Title = "Intervals Needed"
+                });
+
+                double error_const = (DeltaX) * Math.Abs(PrevAnswer - f_a);
+                Error.Add(new Schema {Column = "Decimal", Width = 22});
+                Error.Add(new Schema {Column = "Intervals", Width = 22});
+
+                Console.WriteLine(Error.GenerateHeaders());
+
+                for (int i = -18; i < 18; i++)
+                {
+                    int intervals = (int)Math.Ceiling( error_const * (2 * Math.Pow(10,i)) );
+
+                    if (intervals < 0 || intervals == 1)
+                    {
+                        continue;
+                    }
+
+                    Error.Add(new string[] {i.ToString(), intervals.ToString() });
+
+                    if ((n / 2) >= intervals)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+
+                    Console.WriteLine(Error.GenerateNextRow());
+                }
+                Console.Write(Error.GenerateFooter());
+
+                Console.ForegroundColor = ConsoleColor.White;
+                if (Error.SuggestedRedraw)
+                {
+                    Console.WriteLine(Error.Redraw());
+                }
+
                 Console.WriteLine();
-                Console.WriteLine($"{Min} ≤ x ≤ {Max}");
+
+                Tables<string> Approx = new Tables<string>(new Config()
+                {
+                    Format = Format.Default,
+                    Title = "Approximations"
+                });
+
+                Approx.Add(new Schema {Column = "Type", Width = 12});
+                Approx.Add(new Schema {Column = "Sum", Width = 18});
+                Approx.Add(new Schema {Column = "Approximation", Width = 18});
+                Approx.Add(new Schema {Column = "Error", Width = 18});
+
+                Console.WriteLine(Approx.GenerateHeaders());
+
+                List<double> approximations = new List<double>(5);
+                approximations.Add(LApprox);
+                approximations.Add(RApprox);
+                approximations.Add(MApprox);
+                approximations.Add(TApprox);
+
+                Approx.Add(new string[] {"Left", Rsum.ToString(), LApprox.ToString() , Lerror.ToString()});
+                Approx.Add(new string[] {"Right", Lsum.ToString(), RApprox.ToString(), "" });
+                Approx.Add(new string[] {"Mid", MidSum.ToString(), MApprox.ToString(), "" });
+                Approx.Add(new string[] { "Trapezoidal", "NA", TApprox.ToString(), "" });
+
+                if ( (n / 2) % 2 == 0)
+                {
+                    approximations.Add((TApprox + 2 * MApprox) / 3);
+                    Approx.Add(new string[] {"Simpson", "NA", ( (TApprox + 2 * MApprox) / 3 ).ToString(), ""});
+                }
+                else
+                {
+                    Approx.Add(new string[] { "Simpson", "NA", "NA", "" });
+                }
+
+                Console.Write(Approx.GenerateBody());
+                Console.Write(Approx.GenerateFooter());
+
+                if (Approx.SuggestedRedraw)
+                {
+                    Console.WriteLine(Approx.Redraw());
+                }
+
+                Console.WriteLine();
+
+                approximations.Sort();
+                for (int i = 0; i < 2; i++)
+                {
+                    double min = approximations.First();
+                    var data2 = approximations.Last();
+
+                    approximations.Remove(min);
+                    approximations.Remove(data2);
+
+                    Console.WriteLine($"{min} ≤ x ≤ {data2}");
+                }
+
+                if (approximations.Count > 0)
+                {
+                    Console.WriteLine($"x ≈ {approximations.First()}");
+                }
             }
 
             if (!RPN.ContainsVariables)

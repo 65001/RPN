@@ -22,7 +22,7 @@ namespace Solver
 
             if (!SupressOutput)
             {
-                Console.Title = "Math Solver 1.0.4";
+                Console.Title = "Math Solver 1.0.5";
                 Console.WindowWidth = Console.BufferWidth;
                 Console.WriteLine("(C) 2018. Abhishek Sathiabalan");
 

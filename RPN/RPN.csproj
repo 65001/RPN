@@ -6,6 +6,8 @@
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\Users\asath\Documents\Github Projects\RPN\Backup\RPN\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
+    <Version>1.0.5</Version>
+    <Authors>Abhishek Sathiabalan</Authors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AbMath">
