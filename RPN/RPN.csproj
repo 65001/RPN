@@ -6,9 +6,12 @@
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\Users\asath\Documents\Github Projects\RPN\Backup\RPN\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <Authors>Abhishek Sathiabalan</Authors>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.2" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="AbMath">
       <HintPath>..\..\AbMath\AbMath\bin\Release\netstandard2.0\AbMath.dll</HintPath>

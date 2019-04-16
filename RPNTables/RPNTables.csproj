@@ -11,6 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="AbMath">
       <HintPath>..\..\AbMath\AbMath\AbMath.dll</HintPath>
     </Reference>
