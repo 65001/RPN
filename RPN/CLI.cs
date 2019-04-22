@@ -374,6 +374,7 @@ namespace Solver
             double TApprox = (LApprox + RApprox) / 2;
 
             double Lerror = 2 * DeltaX / n * Math.Abs(PrevAnswer - f_a);
+            double error_const = (DeltaX) * Math.Abs(PrevAnswer - f_a);
 
             Tables<string> Error = new Tables<string>(new Config()
             {
@@ -381,7 +382,6 @@ namespace Solver
                 Title = "Intervals Needed"
             });
 
-            double error_const = (DeltaX) * Math.Abs(PrevAnswer - f_a);
             Error.Add(new Schema { Column = "Decimal", Width = 22 });
             Error.Add(new Schema { Column = "Intervals", Width = 22 });
 

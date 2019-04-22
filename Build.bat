@@ -1,2 +1,2 @@
-call RPN\Build.bat
-call RPNTables\Build.bat
+cd RPN
+call Build.bat

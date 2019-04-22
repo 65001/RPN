@@ -10,9 +10,6 @@
     <Authors>Abhishek Sathiabalan</Authors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.2" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="AbMath">
       <HintPath>..\..\AbMath\AbMath\bin\Release\netstandard2.0\AbMath.dll</HintPath>
     </Reference>
