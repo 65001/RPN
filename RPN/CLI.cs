@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -179,8 +180,8 @@ namespace Solver
                 operators.Add(new Schema {Column = "Arguments", Width = 10});
                 operators.Add(new Schema {Column = "Weights", Width = 8 });
 
-                var RPN = new RPN("");
-                foreach (KeyValuePair<string, RPN.Operator> KV in RPN.Data.Operators)
+                IReadOnlyDictionary<string, RPN.Operator> Dict = new RPN("").Data.Operators.ToImmutableSortedDictionary();
+                foreach (KeyValuePair<string, RPN.Operator> KV in Dict)
                 {
                     operators.Add(new string[] {KV.Key, KV.Value.Assoc.ToString(), KV.Value.Arguments.ToString(), KV.Value.Weight.ToString() });
                 }
@@ -189,11 +190,46 @@ namespace Solver
             }
             else if (Equation.StartsWith("~alias", SC))
             {
+                Config config = new Config() { Format = Format.Default, Title = "Aliases" };
 
+                if (MarkDownMode)
+                {
+                    config.Format = Format.MarkDown;
+                }
+
+                Tables<string> alias = new Tables<string>(config);
+                alias.Add(new Schema { Column = "From", Width = 12 });
+                alias.Add(new Schema { Column = "To", Width = 10 });
+
+                IReadOnlyDictionary<string, string> Dict = new RPN("").Data.Aliases.ToImmutableSortedDictionary();
+
+                foreach (KeyValuePair<string,string> KV in Dict)
+                {
+                    alias.Add(new string[] {KV.Key,KV.Value} );
+                }
+
+                Console.WriteLine(alias.ToString());
             }
             else if (Equation.StartsWith("~format", SC))
             {
+                Config config = new Config() { Format = Format.Default, Title = "Aliases" };
 
+                if (MarkDownMode)
+                {
+                    config.Format = Format.MarkDown;
+                }
+
+                Tables<string> format = new Tables<string>(config);
+                format.Add(new Schema { Column = "Number", Width = 20 });
+                format.Add(new Schema { Column = "Format", Width = 10 });
+
+                IReadOnlyDictionary<double,string> Dict = new RPN("").Data.Format;
+                foreach (var data in Dict)
+                {
+                    format.Add(new string[] {data.Key.ToString(), data.Value });
+                }
+
+                Console.WriteLine(format.ToString());
             }
             else if (Equation.StartsWith("~version", SC))
             {
@@ -228,6 +264,41 @@ namespace Solver
             {
                 MarkDownMode = !MarkDownMode;
             }
+            else if (Equation.StartsWith("~help", SC))
+            {
+                Config config = new Config() { Format = Format.Default, Title = "Help Information" };
+
+                if (MarkDownMode)
+                {
+                    config.Format = Format.MarkDown;
+                }
+
+                Tables<string> help = new Tables<string>(config);
+                help.Add(new Schema {Column = "Command", Width = 15});
+                help.Add(new Schema {Column = "Description", Width = 30});
+
+                help.Add(new string[] {"alias", "Displays a list of all command aliases."});
+                help.Add(new string[] {"debug", "Enables or disables debug mode."});
+                help.Add(new string[] {"format", "Displays a list of numbers and predetermined string representations of them." });
+                help.Add(new string[] {"functions", "Displays a list of all functions." });
+                help.Add(new string[] {"integrate", "Enables or disables integration mode." });
+                help.Add(new string[] {"md", "Changes the output of all tables to markdown or back to regular mode."});
+                help.Add(new string[] {"operators", "Displays a list of all operators." });
+                help.Add(new string[] {"version","Displays version information for this program." });
+
+                Console.WriteLine(help.ToString());
+
+                if (help.SuggestedRedraw)
+                {
+                    Console.WriteLine(help.Redraw());
+                }
+
+                Console.WriteLine("All commands must be prefixed by ~ to work.");
+            }
+            else
+            {
+                Console.WriteLine("Unrecognized meta command. Type ~help to see a list of all possible commands.");
+            }
         }
 
         ///<summary>
@@ -236,7 +307,7 @@ namespace Solver
         static double Calculate(string Equation)
         {
             RPN = GenerateRPN(Equation);
-
+            Console.WriteLine($"{RPN.Data.SimplifiedEquation}");
             PostFix postFix = GeneratePostFix(RPN);
 
             if (RPN.ContainsVariables)
@@ -313,7 +384,7 @@ namespace Solver
 
             for (int x = 0; x <= max; x++)
             {
-                double RealX = start + count * DeltaX / n;
+                double RealX = start + x * DeltaX / n;
                 postFix.SetVariable("ans", PrevAnswer);
                 postFix.SetVariable("x", RealX);
                 double answer = postFix.Compute();
@@ -330,7 +401,7 @@ namespace Solver
                         Rsum += answer;
                     }
 
-                    if (count > 0)
+                    if (x > 0)
                     {
                         Lsum += answer;
                     }
@@ -341,31 +412,17 @@ namespace Solver
                 }
 
                 PrevAnswer = answer;
-                tables.Add(new string[] { (RealX).ToString(), answer.ToString(), });
-
-                if (RPN.Data.ContainsEquation && answer == 1)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                }
-
-                if (RPN.Data.ContainsEquation && answer == 1)
-                {
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-
+                tables.Add(new string[] { RealX.ToString(), answer.ToString() });
                 postFix.Reset();
                 count++;
             }
 
+            //Any elapsed milliseconds is due to the table code
+            long computationalTime = sw.ElapsedMilliseconds;
+
             Console.WriteLine(tables.ToString());
-
-            if (tables.SuggestedRedraw)
-            {
-                Console.WriteLine(tables.Redraw());
-            }
-
+            sw.Stop();
             Console.WriteLine($"Elapsed Time: {sw.ElapsedMilliseconds} (ms)");
-            Console.WriteLine($"Iterations: {count} ");
             Console.WriteLine();
 
             double LApprox = (2 * Rsum * DeltaX / n);
@@ -494,9 +551,9 @@ namespace Solver
 
 
             Console.WriteLine();
-
-            Console.WriteLine($"Equation of {Equation} from {start} to {end} at {freq} with {n} sub intervals.");
-
+            Console.WriteLine($"Equation of {Equation} from {start} to {end} at {freq} with {n} sub intervals and {count} iterations with a computational time of {computationalTime} (ms)");
+            Console.WriteLine($"Iterations per computational ms: { ((double)count) / ((double)computationalTime)}");
+            Console.WriteLine("The difference between the elapsed time and computational time is the time taken to draw the table to the console.");
             Console.WriteLine();
 
             //Simpsons Rule
