@@ -18,11 +18,15 @@ namespace Solver
         private static bool SupressOutput = false;
         private static bool IntegrateMode = false;
 
+        private static List<string> timings;
+
         private static double PrevAnswer;
         
 
         static void Main(string[] args)
         {
+            timings = new List<string>();
+
             if (args.Length > 0)
             {
                 SupressOutput = true;
@@ -263,6 +267,10 @@ namespace Solver
             else if (Equation.StartsWith("~md"))
             {
                 MarkDownMode = !MarkDownMode;
+            }
+            else if (Equation.StartsWith("~time"))
+            {
+                Console.WriteLine( timings.Print() );
             }
             else if (Equation.StartsWith("~help", SC))
             {
@@ -575,7 +583,10 @@ namespace Solver
                 RPN.Data.DebugMode = DebugMode;
                 RPN.Logger += Write;
             }
+
+            RPN.Output += Write;
             RPN.Compute();
+            timings.Add( RPN.Data.TimeRecords().ToString() + "\n\n");
 
             return RPN;
         }
@@ -583,8 +594,10 @@ namespace Solver
         private static PostFix GeneratePostFix(RPN rpn)
         {
             PostFix postFix = new PostFix(rpn);
+
             if (DebugMode)
             {
+                rpn.Data.DebugMode = DebugMode;
                 postFix.Logger += Write;
             }
 

@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <RuntimeIdentifiers>win10-x64;osx.10.11-x64;Portable</RuntimeIdentifiers>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\Users\asath\Documents\Github Projects\RPN\Backup\RPN\</UpgradeBackupLocation>
@@ -10,8 +10,6 @@
     <Authors>Abhishek Sathiabalan</Authors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AbMath">
-      <HintPath>..\..\AbMath\AbMath\bin\Release\netstandard2.0\AbMath.dll</HintPath>
-    </Reference>
+    <PackageReference Include="AbMath" Version="2.0.0" />
   </ItemGroup>
 </Project>
