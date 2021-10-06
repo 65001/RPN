@@ -5,8 +5,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using AbMath;
 using AbMath.Calculator;
-using CLI;
+using AbMath.Utilities;
 
 namespace Solver
 {
@@ -34,7 +35,7 @@ namespace Solver
 
             if (!SupressOutput)
             {
-                Console.Title = "Math Solver 1.0.6";
+                Console.Title = "Math Solver 2.2.0";
                 Console.WindowWidth = Console.BufferWidth;
                 Console.WriteLine("(C) 2018. Abhishek Sathiabalan");
             }
@@ -162,7 +163,7 @@ namespace Solver
                 functions.Add(new Schema {Column = "Max Arguments", Width = 14 });
 
                 var RPN = new RPN("");
-                foreach (KeyValuePair<string, RPN.Function> KV in RPN.Data.Functions)
+                foreach (KeyValuePair<string, Function> KV in RPN.Data.Functions)
                 {
                     functions.Add(new string[] {KV.Key, KV.Value.MinArguments.ToString(), KV.Value.MaxArguments.ToString() });
                 }
@@ -184,8 +185,8 @@ namespace Solver
                 operators.Add(new Schema {Column = "Arguments", Width = 10});
                 operators.Add(new Schema {Column = "Weights", Width = 8 });
 
-                IReadOnlyDictionary<string, RPN.Operator> Dict = new RPN("").Data.Operators.ToImmutableSortedDictionary();
-                foreach (KeyValuePair<string, RPN.Operator> KV in Dict)
+                IReadOnlyDictionary<string, Operator> Dict = new RPN("").Data.Operators.ToImmutableSortedDictionary();
+                foreach (KeyValuePair<string, Operator> KV in Dict)
                 {
                     operators.Add(new string[] {KV.Key, KV.Value.Assoc.ToString(), KV.Value.Arguments.ToString(), KV.Value.Weight.ToString() });
                 }
@@ -477,10 +478,8 @@ namespace Solver
                 {
                     Console.ForegroundColor = ConsoleColor.White;
                 }
-
-                Console.WriteLine(Error.GenerateNextRow());
             }
-            Console.Write(Error.GenerateFooter());
+            Console.WriteLine(Error.ToString());
 
             Console.ForegroundColor = ConsoleColor.White;
             if (Error.SuggestedRedraw)
